@@ -63,6 +63,7 @@ const qs=[
 ];
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbyusqCAEzgtwgW2G548FQXi0tMNMn26odRTSRvmt_BjGvBvTAcRKZjJRe2oVc5fpYO-/exec";
 let i=0,score=0,left=90,timer,answers=Array(qs.length).fill("");
+let submitted=false;
 function startQuiz(){
  const n=document.getElementById("playerName").value.trim();
  if(!n){document.getElementById("nameError").style.display="block";return;}
@@ -106,6 +107,17 @@ function finish(){
    <p style="margin-top:12px">${msg}</p>
    <button class="primary" onclick="location.reload()">再挑戰一次</button>
  </div>`;
+ const playerName=document.getElementById("playerName").value.trim();
+ const payload={name:playerName,score:score,q1:answers[0],q2:answers[1],q3:answers[2],q4:answers[3],q5:answers[4],q6:answers[5],q7:answers[6],q8:answers[7]};
+ const status=document.createElement("p");
+ status.id="submitStatus"; status.className="small"; status.textContent="⏳ 成績傳送中…";
+ result.querySelector(".card").appendChild(status);
+ if(!submitted){
+   submitted=true;
+   fetch(WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)})
+     .then(()=>{status.textContent="✅ 成績已送出至後台";})
+     .catch(()=>{status.textContent="⚠️ 成績傳送失敗，請告知管理者";submitted=false;});
+ }
  window.scrollTo(0,0);
 }
 </script></body></html>
